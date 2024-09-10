@@ -91,13 +91,13 @@ def process_JIRA_issue():
     jira = JIRA(options, token_auth=apikey)
 
     # Provide valid JQL query here:
-     jira_url = 'project = ITQM AND status != Fixed AND component = p51 AND labels in (2024)'
+    jira_jql = 'project = ITQM AND status != Fixed AND component = p51 AND labels in (2024)'
     
-    # jira_url = 'project = ITQM AND component = p51'
-    # jira_url = 'project = ITQM AND component = p51 AND labels in (2024)'
-    # jira_url = 'key in (ITQM-204, ITQM-189)'
+    # jira_jql = 'project = ITQM AND component = p51'
+    # jira_jql = 'project = ITQM AND component = p51 AND labels in (2024)'
+    # jira_jql = 'key in (ITQM-204, ITQM-189)'
     
-    issues = jira.search_issues(jira_url)
+    issues = jira.search_issues(jira_jql)
 
     df_issues = pd.DataFrame()
 
