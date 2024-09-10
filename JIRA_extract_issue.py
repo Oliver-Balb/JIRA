@@ -34,18 +34,19 @@ def cleanse_issue_assignee(issue_key, in_assignee):
     return out_assignee_displayName, out_assignee_emailAddress
 
 def cleanse_issue_relatedpersons(issue_key, in_related_persons):
-    """ Check if there is an entry for assignee and extract display name"""
+    """ Check if there is an entry for related person and extract display name"""
     out_related_persons_displayNames = None 
     out_related_persons_emailAddresses = None
-    count = 0
-    for related_person in in_related_persons:
-        if count != 0:
-            out_related_persons_displayNames = out_related_persons_displayNames + SEPARATOR + related_person.displayName
-            out_related_persons_emailAddresses = out_related_persons_emailAddresses + SEPARATOR + related_person.emailAddress
-        else:
-            out_related_persons_displayNames = related_person.displayName
-            out_related_persons_emailAddresses = related_person.emailAddress
-        count = count + 1
+    if in_related_persons:
+        count = 0
+        for related_person in in_related_persons:
+            if count != 0:
+                out_related_persons_displayNames = out_related_persons_displayNames + SEPARATOR + related_person.displayName
+                out_related_persons_emailAddresses = out_related_persons_emailAddresses + SEPARATOR + related_person.emailAddress
+            else:
+                out_related_persons_displayNames = related_person.displayName
+                out_related_persons_emailAddresses = related_person.emailAddress
+            count = count + 1
         
     return out_related_persons_displayNames, out_related_persons_emailAddresses
 
@@ -70,13 +71,14 @@ def cleanse_issue_organization(issue_key, in_organization):
 def cleanse_issue_components(issue_key, in_components):
     """ Extract components """
     out_components = None
-    count = 0
-    for component in in_components:
-        if count != 0:
-            out_components = out_components + SEPARATOR + component.name
-        else:
-            out_components = component.name
-        count = count + 1
+    if in_components: 
+        count = 0
+        for component in in_components:
+            if count != 0:
+                out_components = out_components + SEPARATOR + component.name
+            else:
+                out_components = component.name
+            count = count + 1
     return out_components
           
 """" Request JIRA issue and extract required data """
@@ -88,10 +90,13 @@ def process_JIRA_issue():
 
     jira = JIRA(options, token_auth=apikey)
 
-    # jira_url = 'project = "PROD: IT Quality Assessment Center" AND issuetype = "Test Plan" and reporter=balbol'
-    jira_url = 'key in (ITQM-204, ITQM-189)'
-    # jira_url = 'key in (XSXO001LP2-530)'
-
+    # Provide valid JQL query here:
+     jira_url = 'project = ITQM AND status != Fixed AND component = p51 AND labels in (2024)'
+    
+    # jira_url = 'project = ITQM AND component = p51'
+    # jira_url = 'project = ITQM AND component = p51 AND labels in (2024)'
+    # jira_url = 'key in (ITQM-204, ITQM-189)'
+    
     issues = jira.search_issues(jira_url)
 
     df_issues = pd.DataFrame()
@@ -104,6 +109,7 @@ def process_JIRA_issue():
         new_issue['url'] = base_frontend_url + 'browse/' + issue.key
         new_issue['id'] = issue.id
         new_issue['issuetype'] = issue.fields.issuetype.name
+        new_issue['priority'] = issue.fields.priority
         new_issue['created'] = issue.fields.created
         new_issue['updated'] = issue.fields.updated
         new_issue['summary'] = issue.fields.summary          
@@ -121,6 +127,7 @@ def process_JIRA_issue():
         df_new_issue = pd.DataFrame([new_issue])
         df_issues = pd.concat([df_issues, df_new_issue], ignore_index=True)        
             
+        """
         print(f"Key:\t\t\t{new_issue['key']}")
         print(f"ID:\t\t\t{new_issue['id']}")
         print(f"IssueType:\t\t{new_issue['issuetype']}") 
@@ -137,6 +144,7 @@ def process_JIRA_issue():
         print(f"Type of new_issue:\t{type(new_issue)}")
 
         print("---------------------")
+        """
         
     df_issues.to_excel(FILEPATH + FILENAME)
         
