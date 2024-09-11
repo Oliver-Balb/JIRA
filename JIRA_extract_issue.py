@@ -24,13 +24,16 @@ FILENAME = f"{now.strftime('%Y%m%d-%H%M%S')}_JIRAIssueExtraction.xlsx"
 SEPARATOR = ";"
 
 def cleanse_datestring(in_string, srcfmt, tgtfmt):
-    
-    print(type(in_string))
-    # Convert the string to a datetime object
-    date_obj = datetime.strptime(in_string, srcfmt)
 
-    # Convert the datetime object to the desired format
-    formatted_date_str = date_obj.strftime(tgtfmt)
+    formatted_date_str = None    
+    
+    if in_string:
+        print(type(in_string))
+        # Convert the string to a datetime object
+        date_obj = datetime.strptime(in_string, srcfmt)
+
+        # Convert the datetime object to the desired format
+        formatted_date_str = date_obj.strftime(tgtfmt)
 
     return formatted_date_str
 
