@@ -1,4 +1,4 @@
-import time
+from datetime import datetime
 import requests
 from jira import JIRA
 import csv
@@ -18,9 +18,21 @@ user = 'oliver.balb@porsche.de'
 apikey = 'cmEHnoGP7wvsR1E8lR3TFpF6XYw2QafUqsFrHm'
 server = base_api_url
 
+now = datetime.now()
 FILEPATH = 'C:/Users/balbol/OneDrive - Dr. Ing. h.c. F. Porsche AG/Documents/_FIG3/P51/Automation/data/'
-FILENAME = f"{time.strftime('%Y%m%d-%H%M%S')}_JIRAIssueExtraction.xlsx"
+FILENAME = f"{now.strftime('%Y%m%d-%H%M%S')}_JIRAIssueExtraction.xlsx"
 SEPARATOR = ";"
+
+def cleanse_datestring(in_string, srcfmt, tgtfmt):
+    
+    print(type(in_string))
+    # Convert the string to a datetime object
+    date_obj = datetime.strptime(in_string, srcfmt)
+
+    # Convert the datetime object to the desired format
+    formatted_date_str = date_obj.strftime(tgtfmt)
+
+    return formatted_date_str
 
 def cleanse_issue_assignee(issue_key, in_assignee):
     """ Check if there is an entry for assignee and extract display name"""
@@ -91,9 +103,9 @@ def process_JIRA_issue():
     jira = JIRA(options, token_auth=apikey)
 
     # Provide valid JQL query here:
-    jira_jql = 'project = ITQM AND status != Fixed AND component = p51 AND labels in (2024)'
+    # jira_jql = 'project = ITQM AND status != Fixed AND component = p51 AND labels in (2024)'
     
-    # jira_jql = 'project = ITQM AND component = p51'
+    jira_jql = 'project = ITQM AND component = p51'
     # jira_jql = 'project = ITQM AND component = p51 AND labels in (2024)'
     # jira_jql = 'key in (ITQM-204, ITQM-189)'
     
@@ -110,6 +122,7 @@ def process_JIRA_issue():
         new_issue['id'] = issue.id
         new_issue['issuetype'] = issue.fields.issuetype.name
         new_issue['priority'] = issue.fields.priority
+        new_issue['duedate'] = cleanse_datestring(issue.fields.duedate, srcfmt = "%Y-%m-%d", tgtfmt="%d.%m.%Y")
         new_issue['created'] = issue.fields.created
         new_issue['updated'] = issue.fields.updated
         new_issue['summary'] = issue.fields.summary          
