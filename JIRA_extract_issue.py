@@ -65,7 +65,7 @@ def cleanse_issue_assignee(issue_key, in_assignee):
     out_assignee_firstname = ""
     out_assignee_lastname = ""
     out_assignee_department = ""
-    if in_assignee:
+    if (in_assignee and in_assignee.displayName != "Deactivated account"):
         out_assignee_displayName = in_assignee.displayName
         out_assignee_emailAddress = in_assignee.emailAddress
         out_assignee_firstname, out_assignee_lastname, out_assignee_department = convert_name_format(in_assignee.displayName)
@@ -80,13 +80,14 @@ def cleanse_issue_relatedpersons(issue_key, in_related_persons):
     if in_related_persons:
         count = 0
         for related_person in in_related_persons:
-            if count != 0:
-                out_related_persons_displayNames = out_related_persons_displayNames + SEPARATOR + related_person.displayName
-                out_related_persons_emailAddresses = out_related_persons_emailAddresses + SEPARATOR + related_person.emailAddress
-            else:
-                out_related_persons_displayNames = related_person.displayName
-                out_related_persons_emailAddresses = related_person.emailAddress
-            count = count + 1
+            if related_person.displayName != "Deactivated account":
+                if count != 0:
+                    out_related_persons_displayNames = out_related_persons_displayNames + SEPARATOR + related_person.displayName
+                    out_related_persons_emailAddresses = out_related_persons_emailAddresses + SEPARATOR + related_person.emailAddress
+                else:
+                    out_related_persons_displayNames = related_person.displayName
+                    out_related_persons_emailAddresses = related_person.emailAddress
+                count = count + 1
         
     return out_related_persons_displayNames, out_related_persons_emailAddresses
 
@@ -131,11 +132,12 @@ def process_JIRA_issue():
     jira = JIRA(options, token_auth=apikey)
 
     # Provide valid JQL query here:
-    # jira_jql = 'project = ITQM AND status != Fixed AND component = p51 AND labels in (2024)'
+    jira_jql = 'project = ITQM AND status != Fixed AND component = p51 AND labels in (2024)'
     
-    jira_jql = 'project = ITQM AND component = p51'
+    # jira_jql = 'project = ITQM AND component = p51'
     # jira_jql = 'project = ITQM AND component = p51 AND labels in (2024)'
     # jira_jql = 'key in (ITQM-204, ITQM-189)'
+    # jira_jql = 'key in (ITQM-95, ITQM-101)'
     
     issues = jira.search_issues(jira_jql)
 
