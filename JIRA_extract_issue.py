@@ -23,12 +23,33 @@ FILEPATH = 'C:/Users/balbol/OneDrive - Dr. Ing. h.c. F. Porsche AG/Documents/_FI
 FILENAME = f"{now.strftime('%Y%m%d-%H%M%S')}_JIRAIssueExtraction.xlsx"
 SEPARATOR = ";"
 
-def cleanse_datestring(in_string, srcfmt, tgtfmt):
+def convert_name_format(input_string):
+    
+    lastname = ""
+    firstname = ""
+    department = ""
+
+
+    try:            
+        # Split the input string by comma and space
+        parts = input_string.split(', ')
+        
+        # Extract lastname and firstname
+        lastname = parts[0].strip()
+        firstname = parts[1].split(' (')[0].strip()
+        department = parts[1].split('(')[1][:-1].strip()
+
+    except:
+        lastname = input_string
+        
+    return firstname, lastname, department
+
+
+def convert_datestring(in_string, srcfmt, tgtfmt):
 
     formatted_date_str = None    
     
     if in_string:
-        print(type(in_string))
         # Convert the string to a datetime object
         date_obj = datetime.strptime(in_string, srcfmt)
 
@@ -39,14 +60,18 @@ def cleanse_datestring(in_string, srcfmt, tgtfmt):
 
 def cleanse_issue_assignee(issue_key, in_assignee):
     """ Check if there is an entry for assignee and extract display name"""
-    out_assignee_displayName = None 
-    out_assignee_emailAddress = None
+    out_assignee_displayName = ""
+    out_assignee_emailAddress = ""
+    out_assignee_firstname = ""
+    out_assignee_lastname = ""
+    out_assignee_department = ""
     if in_assignee:
         out_assignee_displayName = in_assignee.displayName
         out_assignee_emailAddress = in_assignee.emailAddress
+        out_assignee_firstname, out_assignee_lastname, out_assignee_department = convert_name_format(in_assignee.displayName)
+        return out_assignee_displayName, out_assignee_emailAddress, out_assignee_firstname, out_assignee_lastname, out_assignee_department
     else:
        print(f"{issue_key}|ERROR|Assignee is empty") 
-    return out_assignee_displayName, out_assignee_emailAddress
 
 def cleanse_issue_relatedpersons(issue_key, in_related_persons):
     """ Check if there is an entry for related person and extract display name"""
@@ -125,11 +150,13 @@ def process_JIRA_issue():
         new_issue['id'] = issue.id
         new_issue['issuetype'] = issue.fields.issuetype.name
         new_issue['priority'] = issue.fields.priority
-        new_issue['duedate'] = cleanse_datestring(issue.fields.duedate, srcfmt = "%Y-%m-%d", tgtfmt="%d.%m.%Y")
+        new_issue['duedate'] = convert_datestring(issue.fields.duedate, srcfmt = "%Y-%m-%d", tgtfmt="%d.%m.%Y")
         new_issue['created'] = issue.fields.created
         new_issue['updated'] = issue.fields.updated
         new_issue['summary'] = issue.fields.summary          
-        new_issue['assignee_displayname'], new_issue['assignee_emailaddress'] = cleanse_issue_assignee(issue.key, issue.fields.assignee)
+        result = cleanse_issue_assignee(issue.key, issue.fields.assignee)
+        if result is not None:
+            new_issue['assignee_displayname'], new_issue['assignee_emailaddress'], new_issue['assignee_firstname'], new_issue['assignee_lastname'], new_issue['assignee_department'] = result
         new_issue['stakeholder_displaynames'], new_issue['stakeholder_emailaddresses'] = cleanse_issue_relatedpersons(issue.key, issue.fields.customfield_11010)
         new_issue['participant_displaynames'], new_issue['participant_emailaddresses'] = cleanse_issue_relatedpersons(issue.key, issue.fields.customfield_12300)
         new_issue['reporter'] = cleanse_issue_reporter(issue.key, issue.fields.reporter)

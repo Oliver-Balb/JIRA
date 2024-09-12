@@ -1,5 +1,33 @@
 from datetime import datetime
 
+def convert_name_format(input_string):
+    
+    try:            
+        # Split the input string by comma and space
+        parts = input_string.split(', ')
+        
+        # Extract lastname and firstname
+        lastname = parts[0].strip()
+        firstname = parts[1].split(' (')[0].strip()
+        department = parts[1].split('(')[1][:-1].strip()
+
+    except:
+        lastname = input_string
+        firstname = None
+        department = None
+    
+    return firstname, lastname, department
+
+# Example usage
+input_string =  "Müller ,   Franz-Walter  Dieter    (FDO3)"
+firstname, lastname, department = convert_name_format(input_string)
+print(firstname)  # Output: John Doe
+print(lastname)
+print(department)
+
+
+
+
 
 # Original date string
 date_str = "2024-10-31"
@@ -22,3 +50,5 @@ now = datetime.now()
 timestamp = now.strftime("%Y%m%d-%H%M%S")
 
 print(timestamp)
+
+
