@@ -13,7 +13,7 @@ base_api_url = "https://api.skyway.porsche.com/jira"
 base_frontend_url = "https://skyway.porsche.com/jira/"
 
 user = 'oliver.balb@porsche.de'
-# To renew access token go to https://skyway.porsche.com/jira/plugins/servlet/desk/portal/1 > "Access Tokens" > on next screen "Create" > on next screen "JIRA"
+# To renew apkikey access token go to https://skyway.porsche.com/jira/plugins/servlet/desk/portal/1 > "Access Tokens" > on next screen "Create" > on next screen "JIRA"
 apikey = 'KLqhNfbXterbOK8jVCsmUHf5Krl8Et85LOxS8E'
 
 server = base_api_url
@@ -132,8 +132,17 @@ def process_JIRA_issue():
     jira = JIRA(options, token_auth=apikey)
 
     # Provide valid JQL query here:
-    jira_jql = 'project = ITQM AND status != Fixed AND component = p51 AND labels in (2024) order by Department ASC'
     
+    # .. ITIKS Tickets der Hauptabteilungen
+    jira_jql = 'project = ITIKS AND labels = P51 AND labels in (2024) AND summary ~ 1st and issuekey != ITIKS-4273 and department not in (FDO2, FDB6, FDE, MA)' 
+    
+    # .. ITQM 1st Line Tickets - nur Hauptabteilungen
+    # jira_jql = 'project = ITQM AND component = p51 AND labels in (2024) and labels in (Übereinkunft) and department not in (FDO, FDB, FDE, MA) order by Department ASC'
+    
+    # .. ITQM Status Tracking 1st Line - Reminder Emails:
+    # jira_jql = 'project = ITQM AND status != Fixed AND component = p51 AND labels in (2024) and labels in (Übereinkunft) order by Department ASC'
+    
+    # .. Sonstige
     # jira_jql = 'project = ITQM AND component = p51'
     # jira_jql = 'project = ITQM AND component = p51 AND labels in (2024)'
     # jira_jql = 'key in (ITQM-204, ITQM-189)'
