@@ -1,7 +1,5 @@
 from datetime import datetime
-import requests
 from jira import JIRA
-import csv
 import pandas as pd
 
 """
@@ -15,7 +13,9 @@ base_api_url = "https://api.skyway.porsche.com/jira"
 base_frontend_url = "https://skyway.porsche.com/jira/"
 
 user = 'oliver.balb@porsche.de'
-apikey = 'cmEHnoGP7wvsR1E8lR3TFpF6XYw2QafUqsFrHm'
+# To renew access token go to https://skyway.porsche.com/jira/plugins/servlet/desk/portal/1 > "Access Tokens" > on next screen "Create" > on next screen "JIRA"
+apikey = 'KLqhNfbXterbOK8jVCsmUHf5Krl8Et85LOxS8E'
+
 server = base_api_url
 
 now = datetime.now()
@@ -132,7 +132,7 @@ def process_JIRA_issue():
     jira = JIRA(options, token_auth=apikey)
 
     # Provide valid JQL query here:
-    jira_jql = 'project = ITQM AND status != Fixed AND component = p51 AND labels in (2024)'
+    jira_jql = 'project = ITQM AND status != Fixed AND component = p51 AND labels in (2024) order by Department ASC'
     
     # jira_jql = 'project = ITQM AND component = p51'
     # jira_jql = 'project = ITQM AND component = p51 AND labels in (2024)'

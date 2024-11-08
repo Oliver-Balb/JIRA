@@ -1,2 +1,0 @@
-# JIRA
-JIRA Issue extraction
