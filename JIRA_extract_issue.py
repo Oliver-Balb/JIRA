@@ -14,7 +14,7 @@ base_frontend_url = "https://skyway.porsche.com/jira/"
 
 user = 'oliver.balb@porsche.de'
 # To renew apkikey access token go to https://skyway.porsche.com/jira/plugins/servlet/desk/portal/1 > "Access Tokens" > on next screen "Create" > on next screen "JIRA"
-apikey = 'KLqhNfbXterbOK8jVCsmUHf5Krl8Et85LOxS8E'
+apikey = 'IFrLdIgwGe4igaex7lAXABUJR7JA1aa72qtDNs'  # 15.11.2024, 11:30 
 
 server = base_api_url
 
@@ -133,8 +133,11 @@ def process_JIRA_issue():
 
     # Provide valid JQL query here:
     
-    # .. ITIKS Tickets der Hauptabteilungen
-    jira_jql = 'project = ITIKS AND labels = P51 AND labels in (2024) AND summary ~ 1st and issuekey != ITIKS-4273 and department not in (FDO2, FDB6, FDE, MA)' 
+    # .. ITIKS Tickets 2025 Identifizierungskontrollen
+    # jira_jql = 'labels = P51 and project = itiks and Lead =2025 and labels = P51 and issuekey != ITIKS-4273 and summary ~ Identifikation order by Department asc'
+    
+    # .. ITIKS Tickets 2025 Einhaltung der Hauptabteilungen
+    jira_jql = 'labels = P51 and project = itiks and Lead = 2025 and Project-Labels = 1st  and labels = P51 and summary ~ Einhaltung order by Department asc' 
     
     # .. ITQM 1st Line Tickets - nur Hauptabteilungen
     # jira_jql = 'project = ITQM AND component = p51 AND labels in (2024) and labels in (Übereinkunft) and department not in (FDO, FDB, FDE, MA) order by Department ASC'
