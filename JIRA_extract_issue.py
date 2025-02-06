@@ -1,6 +1,7 @@
 from datetime import datetime
-from jira import JIRA
+from jira import JIRA, JIRAError
 import pandas as pd
+import sys
 
 """
 Further packages required to pip install:
@@ -14,7 +15,7 @@ base_frontend_url = "https://skyway.porsche.com/jira/"
 
 user = 'oliver.balb@porsche.de'
 # To renew apkikey access token go to https://skyway.porsche.com/jira/plugins/servlet/desk/portal/1 > "Access Tokens" > on next screen "Create" > on next screen "JIRA"
-apikey = 'IFrLdIgwGe4igaex7lAXABUJR7JA1aa72qtDNs'  # 15.11.2024, 11:30 
+apikey = ''  # 16.01.2025, 09:00 
 
 server = base_api_url
 
@@ -129,15 +130,24 @@ def process_JIRA_issue():
     'server': server
     }
 
-    jira = JIRA(options, token_auth=apikey)
+    try:
+       jira = JIRA(options, token_auth=apikey)
+    except JIRAError as e:
+        if e.status_code == 401:
+            print('Authentication error - renew apikey access token: Go to https://skyway.porsche.com/jira/plugins/servlet/desk/portal/1',
+                  '> "Access Tokens" > on next screen "Create" > on next screen "JIRA"')
+            sys.exit(1)  # Exit the program with a non-zero status code
+        else:
+            print(f"An error occurred: {e}")
+            sys.exit(1)  # Exit the program with a non-zero status code
 
     # Provide valid JQL query here:
     
     # .. ITIKS Tickets 2025 Identifizierungskontrollen
     # jira_jql = 'labels = P51 and project = itiks and Lead =2025 and labels = P51 and issuekey != ITIKS-4273 and summary ~ Identifikation order by Department asc'
     
-    # .. ITIKS Tickets 2025 Einhaltung der Hauptabteilungen
-    jira_jql = 'labels = P51 and project = itiks and Lead = 2025 and Project-Labels = 1st  and labels = P51 and summary ~ Einhaltung order by Department asc' 
+    # .. ITIKS Tickets 2025 Einhaltung der Hauptabteilungen, OHNEe Tickets mit Status COMPLETED
+    jira_jql = 'labels = P51 and project = itiks and Lead =2025 and issuekey != ITIKS-4273 and status != Completed  order by Department asc' 
     
     # .. ITQM 1st Line Tickets - nur Hauptabteilungen
     # jira_jql = 'project = ITQM AND component = p51 AND labels in (2024) and labels in (Übereinkunft) and department not in (FDO, FDB, FDE, MA) order by Department ASC'
@@ -151,7 +161,18 @@ def process_JIRA_issue():
     # jira_jql = 'key in (ITQM-204, ITQM-189)'
     # jira_jql = 'key in (ITQM-95, ITQM-101)'
     
-    issues = jira.search_issues(jira_jql)
+
+    try: 
+        issues = jira.search_issues(jira_jql)
+    except JIRAError as e:
+        if e.status_code == 401:
+            print('Authentication error - renew apikey access token: Go to https://skyway.porsche.com/jira/plugins/servlet/desk/portal/1',
+                  '> "Access Tokens" > on next screen "Create" > on next screen "JIRA"')
+            sys.exit(1)  # Exit the program with a non-zero status code
+        else:
+            print(f"An error occurred: {e}")
+            sys.exit(1)  # Exit the program with a non-zero status code
+
 
     df_issues = pd.DataFrame()
 
