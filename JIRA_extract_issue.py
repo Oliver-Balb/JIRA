@@ -12,13 +12,15 @@ openpyxl
 
 """ Constants - General """
 
-secrets = dotenv_values(".env")
-
 base_api_url = "https://api.skyway.porsche.com/jira"
 base_frontend_url = "https://skyway.porsche.com/jira/"
 
 user = 'oliver.balb@porsche.de'
+
+secrets = dotenv_values("C:/Users/balbol/OneDrive - Dr. Ing. h.c. F. Porsche AG/Documents/_FIG3/P51/Automation/prg/JIRA/.env")
 # To renew apkikey access token go to https://skyway.porsche.com/jira/plugins/servlet/desk/portal/1 > "Access Tokens" > on next screen "Create" > on next screen "JIRA"
+# Update the apikey in the secrets file .env specified above:
+# apikey=EnVN*************************VNOj
 apikey = secrets['apikey']  # 16.01.2025, 09:00 
 
 server = base_api_url
