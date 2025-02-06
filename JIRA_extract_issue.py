@@ -2,6 +2,8 @@ from datetime import datetime
 from jira import JIRA, JIRAError
 import pandas as pd
 import sys
+from dotenv import dotenv_values
+
 
 """
 Further packages required to pip install:
@@ -10,12 +12,14 @@ openpyxl
 
 """ Constants - General """
 
+secrets = dotenv_values(".env")
+
 base_api_url = "https://api.skyway.porsche.com/jira"
 base_frontend_url = "https://skyway.porsche.com/jira/"
 
 user = 'oliver.balb@porsche.de'
 # To renew apkikey access token go to https://skyway.porsche.com/jira/plugins/servlet/desk/portal/1 > "Access Tokens" > on next screen "Create" > on next screen "JIRA"
-apikey = ''  # 16.01.2025, 09:00 
+apikey = secrets['apikey']  # 16.01.2025, 09:00 
 
 server = base_api_url
 
